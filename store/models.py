@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     
     class Meta:
         verbose_name = 'Категория'
@@ -17,11 +17,23 @@ class Category(models.Model):
         return self.name
 
 
+class Author(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = 'Автор'
+        verbose_name_plural = 'Авторы'
+        
+    def __str__(self) -> str:
+        return self.name
+
+
 class Book(models.Model):
+    author = models.ManyToManyField(Author, related_name='books')
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=250)
-    file = models.FileField(upload_to='books/%Y/%m/%d/')
-    Publication_date = models.DateField()
+    file = models.FileField(upload_to='books/%Y/%m/%d/', null=True, blank=True)
+    publication_date = models.DateField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField(Category, related_name='books')
@@ -34,6 +46,9 @@ class Book(models.Model):
             models.Index(fields=['title', 'description']),
             models.Index(fields=['created'])
         ]
+        
+    def __str__(self) -> str:
+        return self.title
     
     
 class Commentary(models.Model):
