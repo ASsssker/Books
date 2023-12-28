@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import empty
 from .models import Author, Category, Book
 
 
@@ -72,3 +73,10 @@ class BookUpdateSerializer(serializers.ModelSerializer):
         return instance
         
         
+class CategoryCreareOrReadSerializer(serializers.ModelSerializer):
+    books = BookCreateOrReadSerializer(many=True)
+    
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'books')
+    
