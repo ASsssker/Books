@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 # Create your models here.
 
@@ -52,4 +53,20 @@ class Book(models.Model):
     
     
 class Commentary(models.Model):
-    ...
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='commentary')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='commentary')
+    text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-created', '-updated']
+        indexes  = [
+            models.Index(fields=('-created', 'updated'))
+        ]
+        
+    def __str__(self) -> str:
+        return f'{self.author.username} commented {self.book}'
+        

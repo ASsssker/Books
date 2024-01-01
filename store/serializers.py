@@ -1,6 +1,14 @@
 from rest_framework import serializers
-from rest_framework.fields import empty
-from .models import Author, Category, Book
+from django.shortcuts import get_object_or_404
+from .models import Author, Category, Book, Commentary, User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=50)
+    
+    class Meta:
+        model = User
+        fields = ('username',)
 
 
 class CategoryAddSerializer(serializers.ModelSerializer):
@@ -19,14 +27,23 @@ class AuthorAddSerializer(serializers.ModelSerializer):
         fields  = ('id', 'name')
 
 
+class CommentReadSerializer(serializers.ModelSerializer):
+    author = UserSerializer()
+    
+    class Meta:
+        model = Commentary
+        fields = ('author', 'text', 'created', 'updated')
+
+
 class BookCreateOrReadSerializer(serializers.ModelSerializer):
     author = AuthorAddSerializer(many=True)
     categories = CategoryAddSerializer(many=True)
+    commentary = CommentReadSerializer(many=True)
 
     class Meta:
         model = Book
         fields = ('id', 'author', 'title', 'description', 'publication_date', 
-                  'created', 'updated', 'categories')
+                  'created', 'updated', 'categories', 'commentary')
         
         
     def create(self, validated_data):
@@ -79,4 +96,24 @@ class CategoryCreareOrReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name', 'books')
+
+        
+class CommentaryCreatOrReadSerializer(serializers.ModelSerializer):
+    book_id = serializers.IntegerField(required=False)
+    author = UserSerializer()
     
+    class Meta:
+        model = Commentary
+        fields = ('author', 'text', 'created', 'updated', 'book_id')
+        
+    def create(self, validated_data):
+        print(validated_data)
+        author_data = validated_data.pop('author')
+        book_id = validated_data.pop('book_id')
+        author = get_object_or_404(User, **author_data)
+        commentary = Commentary(**validated_data)
+        commentary.author = author
+        commentary.book_id = book_id
+        commentary.save()
+        return commentary
+        

@@ -40,7 +40,27 @@ INSTALLED_APPS = [
     'store',
     'accounts',
     'rest_framework',
+    'drf_spectacular',
 ]
+
+
+REST_FRAMEWORK = {
+     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', 
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Store API", # название проекта
+    "SERVE_INCLUDE_SCHEMA": True, # исключить эндпоинт /schema
+    "SWAGGER_UI_SETTINGS": {
+        "filter": True, # включить поиск по тегам
+    },
+    "COMPONENT_SPLIT_REQUEST": True
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
