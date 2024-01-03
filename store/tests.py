@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.forms.models import model_to_dict
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Book, User
+from .models import Book, User, Category
 from .serializers import BookSerializer
 
 # Create your tests here.
@@ -58,3 +58,5 @@ class BookTest(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         
+        
+    

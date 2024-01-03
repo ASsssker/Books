@@ -3,20 +3,20 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import BookSerializer, CategoryCreareOrReadSerializer, CommentaryCreatOrReadSerializer
+from .serializers import BookSerializer, CategoryCreareOrReadSerializer, CommentaryCreatOrReadSerializer, BookListSerializer
 from .models import Book, Category, Commentary
 
 # Create your views here.
 
 class BookListView(APIView):
     def get(self, request, fomrat=None):
-        books = Book.objects.all().prefetch_related('author', 'categories', 'commentary', 'commentary__author')
-        serializer = BookSerializer(books, many=True)
+        books = Book.objects.all().prefetch_related('author', 'categories')
+        serializer = BookListSerializer(books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, fomrat=None):
         data = request.data.copy()
-        serializer = BookSerializer(data=data)
+        serializer = BookListSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -87,7 +87,7 @@ class CommentaryDetailView(APIView):
     
 class CategoryListView(APIView):
     def get(self, request, fomrat=None):
-        categories = Category.objects.all()
+        categories = Category.objects.all().prefetch_related('books', 'books__author')
         serializer = CategoryCreareOrReadSerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -103,6 +103,6 @@ class CategoryListView(APIView):
     
 class BooksByCategory(APIView):
     def get(self, request, pk=None, format=None):
-        books_by_category = get_object_or_404(Category.objects.prefetch_related('books'), pk=pk)
+        books_by_category = get_object_or_404(Category.objects.prefetch_related('books', 'books__author'), pk=pk)
         serializer = CategoryCreareOrReadSerializer(books_by_category)
         return Response(serializer.data, status=status.HTTP_200_OK)

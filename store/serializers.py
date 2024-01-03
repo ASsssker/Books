@@ -45,7 +45,6 @@ class BookSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'title', 'description', 'publication_date', 
                   'created', 'updated', 'categories', 'commentary')
         
-        
     def create(self, validated_data):
         author_data = validated_data.pop('author', None)
         categories_data = validated_data.pop('categories', None)
@@ -82,8 +81,22 @@ class BookSerializer(serializers.ModelSerializer):
         return instance
         
         
+class BookListSerializer(BookSerializer):
+    class Meta:
+        model = Book
+        fields = ('id', 'title', 'description', 'publication_date', 
+                  'created', 'updated', 'author', 'categories')
+        
+        
+class BookSerializerOnCategory(BookSerializer):
+    class Meta:
+        model = Book
+        fields = ('id', 'title', 'description', 'publication_date', 
+                  'created', 'updated', 'author')
+
+
 class CategoryCreareOrReadSerializer(serializers.ModelSerializer):
-    books = BookSerializer(many=True)
+    books = BookSerializerOnCategory(many=True)
     
     class Meta:
         model = Category
