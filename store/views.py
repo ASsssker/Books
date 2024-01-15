@@ -64,8 +64,8 @@ class CommentaryListView(APIView):
     
     
 class CommentaryDetailView(APIView):
-    def get(self, request, book_pk, comment_pk, format=None):
-        comment = get_object_or_404(Commentary.objects.all().prefetch_related('author'), pk=comment_pk)
+    def get(self, request, pk, format=None):
+        comment = get_object_or_404(Commentary.objects.select_related('author'), pk=pk)
         serializer = CommentaryCreatOrReadSerializer(comment)
         return Response(serializer.data, status=status.HTTP_200_OK)
     

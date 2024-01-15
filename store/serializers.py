@@ -96,7 +96,7 @@ class BookSerializerOnCategory(BookSerializer):
 
 
 class CategoryCreareOrReadSerializer(serializers.ModelSerializer):
-    books = BookSerializerOnCategory(many=True)
+    books = BookSerializerOnCategory(many=True, required=False)
     
     class Meta:
         model = Category
